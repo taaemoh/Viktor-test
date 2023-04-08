@@ -1,24 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import Grid from './components/Grid/Grid';
+import Pagination from './components/Pagination/Pagination';
+import { APIResponse } from './types/types';
 
-function App() {
+// https://cms.viktor.ai/blogposts?blogpost_categories.id=5&_start=0&_limit=10
+const App = () => {
+  const [data, setData] = useState([]);
+  const [_start, setStart] = useState(2);
+  const GRID_LENGTH = 4
+
+  const url = `${process.env.REACT_APP_API_URL}&_start=${_start * GRID_LENGTH}`;
+
+  useEffect(() => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => setData(data));
+  }, [url]);
+
+
+  const handlePageChange = (newPage: number) => {
+    setStart(newPage)
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Grid posts={data} />
+      <Pagination currentPage={_start} onPageChange={handlePageChange} />
     </div>
   );
 }
